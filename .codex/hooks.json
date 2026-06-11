@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "task:start": [
+      "node scripts/wled-hook.js running"
+    ],
+    "task:success": [
+      "node scripts/wled-hook.js success"
+    ],
+    "task:error": [
+      "node scripts/wled-hook.js error"
+    ],
+    "review:start": [
+      "node scripts/wled-hook.js review"
+    ],
+    "task:complete": [
+      "node scripts/wled-hook.js finish"
+    ]
+  }
+}

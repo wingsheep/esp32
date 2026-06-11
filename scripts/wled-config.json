@@ -1,0 +1,11 @@
+{
+  "port": "/dev/cu.SLAB_USBtoUART",
+  "baudRate": 115200,
+  "presets": {
+    "running": 1,
+    "success": 2,
+    "error": 3,
+    "review": 4,
+    "finish": 5
+  }
+}
