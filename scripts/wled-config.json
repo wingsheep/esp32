@@ -1,11 +1,32 @@
 {
-  "port": "/dev/cu.SLAB_USBtoUART",
+  "port": "/dev/cu.usbserial-0001",
   "baudRate": 115200,
+  "ledRange": {
+    "start": 0,
+    "stop": null
+  },
   "presets": {
     "running": 1,
     "success": 2,
     "error": 3,
     "review": 4,
     "finish": 5
+  },
+  "states": {
+    "running": {
+      "color": [0, 0, 255]
+    },
+    "success": {
+      "color": [0, 255, 0]
+    },
+    "error": {
+      "color": [255, 0, 0]
+    },
+    "review": {
+      "color": [255, 160, 0]
+    },
+    "finish": {
+      "color": [255, 255, 255]
+    }
   }
 }

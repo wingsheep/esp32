@@ -8,15 +8,6 @@ const config = JSON.parse(
   )
 );
 
-const action = process.argv[2];
-
-const state = config.states?.[action];
-const ledRange = config.ledRange ?? {};
-
-if (!state) {
-  process.exit(0);
-}
-
 const port = new SerialPort({
   path: config.port,
   baudRate: config.baudRate,
@@ -29,19 +20,8 @@ port.open(err => {
     process.exit(1);
   }
 
-  const payload = {
-    on: true,
-    seg: [
-      {
-        ...(Number.isInteger(ledRange.start) ? { start: ledRange.start } : {}),
-        ...(Number.isInteger(ledRange.stop) ? { stop: ledRange.stop } : {}),
-        col: [state.color]
-      }
-    ]
-  };
-
   setTimeout(() => {
-    port.write(`${JSON.stringify(payload)}\n`, writeErr => {
+    port.write(`${JSON.stringify({ on: false })}\n`, writeErr => {
       if (writeErr) {
         console.error(writeErr);
         process.exit(1);

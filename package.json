@@ -2,10 +2,15 @@
   "name": "esp32",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "wled:running": "node scripts/wled-hook.js running",
+    "wled:success": "node scripts/wled-hook.js success",
+    "wled:error": "node scripts/wled-hook.js error",
+    "wled:review": "node scripts/wled-hook.js review",
+    "wled:finish": "node scripts/wled-hook.js finish",
+    "wled:off": "node scripts/wled-off.js",
+    "ports": "node scripts/wled-ports.js"
   },
   "keywords": [],
   "author": "",
