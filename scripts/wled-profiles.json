@@ -9,19 +9,74 @@
   },
   "profiles": {
     "running": {
-      "color": [0, 0, 255]
+      "payload": {
+        "on": true,
+        "bri": 160,
+        "seg": [
+          {
+            "fx": 2,
+            "sx": 128,
+            "ix": 128,
+            "col": [[0, 0, 255]]
+          }
+        ]
+      }
     },
     "success": {
-      "color": [0, 255, 0]
+      "payload": {
+        "on": true,
+        "bri": 160,
+        "seg": [
+          {
+            "fx": 2,
+            "sx": 128,
+            "ix": 128,
+            "col": [[0, 255, 0]]
+          }
+        ]
+      }
     },
     "error": {
-      "color": [255, 0, 0]
+      "payload": {
+        "on": true,
+        "bri": 160,
+        "seg": [
+          {
+            "fx": 2,
+            "sx": 160,
+            "ix": 160,
+            "col": [[255, 0, 0]]
+          }
+        ]
+      }
     },
     "review": {
-      "color": [255, 160, 0]
+      "payload": {
+        "on": true,
+        "bri": 160,
+        "seg": [
+          {
+            "fx": 2,
+            "sx": 128,
+            "ix": 128,
+            "col": [[255, 160, 0]]
+          }
+        ]
+      }
     },
     "finish": {
-      "color": [255, 255, 255]
+      "payload": {
+        "on": true,
+        "bri": 160,
+        "seg": [
+          {
+            "fx": 2,
+            "sx": 96,
+            "ix": 128,
+            "col": [[255, 255, 255]]
+          }
+        ]
+      }
     }
   }
 }

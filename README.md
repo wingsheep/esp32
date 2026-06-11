@@ -42,7 +42,18 @@ pnpm build
   },
   "profiles": {
     "running": {
-      "color": [0, 0, 255]
+      "payload": {
+        "on": true,
+        "bri": 160,
+        "seg": [
+          {
+            "fx": 2,
+            "sx": 128,
+            "ix": 128,
+            "col": [[0, 0, 255]]
+          }
+        ]
+      }
     },
     "success": {
       "color": [0, 255, 0]
@@ -68,7 +79,8 @@ pnpm build
 - `defaults.ledRange.start`：起始灯珠索引，从 `0` 开始。
 - `defaults.ledRange.stop`：结束灯珠索引，不包含该位置；设为 `null` 表示不限制结束位置。
 - `profiles`：本地快捷配置，不对应 WLED 设备里的 preset。
-- `profiles.*.color`：RGB 颜色，格式为 `[红, 绿, 蓝]`，取值范围为 `0-255`。
+- `profiles.*.color`：简写 RGB 颜色，格式为 `[红, 绿, 蓝]`，取值范围为 `0-255`。
+- `profiles.*.payload`：完整 WLED JSON payload；如果配置了 `payload`，会优先使用它。
 
 例如只控制前 10 颗灯：
 
@@ -90,11 +102,12 @@ pnpm wled:ports
 ## 可用命令
 
 ```bash
-pnpm wled -- running
-pnpm wled -- success
-pnpm wled -- error
-pnpm wled -- review
-pnpm wled -- finish
+pnpm wled
+pnpm wled:running
+pnpm wled:success
+pnpm wled:error
+pnpm wled:review
+pnpm wled:finish
 pnpm wled:off
 pnpm wled:ports
 ```
@@ -115,11 +128,12 @@ node dist/wled.mjs ports
 
 命令含义：
 
-- `wled -- running`：应用 `running` profile。
-- `wled -- success`：应用 `success` profile。
-- `wled -- error`：应用 `error` profile。
-- `wled -- review`：应用 `review` profile。
-- `wled -- finish`：应用 `finish` profile。
+- `wled`：显示 CLI 帮助。
+- `wled:running`：应用 `running` profile。
+- `wled:success`：应用 `success` profile。
+- `wled:error`：应用 `error` profile。
+- `wled:review`：应用 `review` profile。
+- `wled:finish`：应用 `finish` profile。
 - `wled:off`：关闭灯光。
 - `wled:ports`：列出本机可用串口。
 
@@ -144,6 +158,12 @@ node dist/wled.mjs send --off
 
 `--range 0:20` 表示控制索引 `0` 到 `19` 的 20 颗灯。
 
+需要自定义 profile 名称时，直接传给 CLI：
+
+```bash
+node dist/wled.mjs profile running
+```
+
 ## Codex 集成
 
 项目级 hooks 位于 `.codex/hooks.json`，使用 Codex 官方 hooks 格式：
@@ -157,18 +177,37 @@ node dist/wled.mjs send --off
 
 ## 灯光说明
 
-当前脚本直接通过串口发送 RGB 颜色，不依赖 WLED 设备内保存的预设。
+当前脚本直接通过串口发送 WLED JSON，不依赖 WLED 设备内保存的预设。默认 profile 当前都配置为呼吸灯效果。
 
-| 状态 | 颜色值 | 灯光 |
-| --- | ---: | --- |
-| `running` | `[0, 0, 255]` | 蓝色，表示任务正在运行 |
-| `success` | `[0, 255, 0]` | 绿色，表示任务成功 |
-| `error` | `[255, 0, 0]` | 红色，表示任务失败或异常 |
-| `review` | `[255, 160, 0]` | 黄色或橙黄色，表示等待审核 |
-| `finish` | `[255, 255, 255]` | 白色，表示任务完成 |
-| `off` | - | 关闭灯光 |
+| 状态 | 颜色值 | 效果 | 含义 |
+| --- | ---: | --- | --- |
+| `running` | `[0, 0, 255]` | 蓝色呼吸灯 | 任务正在运行 |
+| `success` | `[0, 255, 0]` | 绿色呼吸灯 | 任务成功 |
+| `error` | `[255, 0, 0]` | 红色较快呼吸灯 | 任务失败或异常 |
+| `review` | `[255, 160, 0]` | 黄色或橙黄色呼吸灯 | 等待审核 |
+| `finish` | `[255, 255, 255]` | 白色慢速呼吸灯 | 任务完成 |
+| `off` | - | 关闭灯光 | 关闭灯光 |
 
-如果要调整颜色，修改 `scripts/wled-profiles.json` 中对应 profile 的 `color` 即可。
+如果要调整颜色或效果，修改 `scripts/wled-profiles.json` 中对应 profile 的 `payload` 即可。
+
+呼吸灯使用 WLED effect `fx: 2`，`sx` 控制速度，`ix` 控制强度。例如蓝色呼吸灯：
+
+```json
+"running": {
+  "payload": {
+    "on": true,
+    "bri": 160,
+    "seg": [
+      {
+        "fx": 2,
+        "sx": 128,
+        "ix": 128,
+        "col": [[0, 0, 255]]
+      }
+    ]
+  }
+}
+```
 
 ## 项目结构
 

@@ -12,11 +12,12 @@ Use this skill to control the local ESP32/WLED light over serial.
 Run commands from `/Users/sheep/Desktop/me/esp32`:
 
 ```bash
-pnpm wled -- running
-pnpm wled -- success
-pnpm wled -- error
-pnpm wled -- review
-pnpm wled -- finish
+pnpm wled
+pnpm wled:running
+pnpm wled:success
+pnpm wled:error
+pnpm wled:review
+pnpm wled:finish
 pnpm wled:off
 pnpm wled:ports
 ```
@@ -45,11 +46,11 @@ cat payload.json | node /Users/sheep/Desktop/me/esp32/dist/wled.mjs send --stdin
 
 ## State Map
 
-- `running`: blue, task is in progress.
-- `success`: green, task succeeded.
-- `error`: red, task failed.
-- `review`: yellow/orange, waiting for approval or review.
-- `finish`: white, task finished.
+- `running`: blue breathing effect, task is in progress.
+- `success`: green breathing effect, task succeeded.
+- `error`: faster red breathing effect, task failed.
+- `review`: yellow/orange breathing effect, waiting for approval or review.
+- `finish`: slow white breathing effect, task finished.
 - `off`: turn the light off.
 
 ## Configuration
@@ -60,7 +61,8 @@ Edit `/Users/sheep/Desktop/me/esp32/scripts/wled-profiles.json` to change:
 - `baudRate`: serial baud rate.
 - `defaults.ledRange.start`: first LED index, starting from `0`.
 - `defaults.ledRange.stop`: exclusive ending LED index. Use `null` to control all LEDs.
-- `profiles.*.color`: RGB color values.
+- `profiles.*.color`: shorthand RGB color values.
+- `profiles.*.payload`: full WLED JSON payload. This takes precedence over `color`.
 
 ## Codex Hooks
 

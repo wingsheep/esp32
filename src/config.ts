@@ -2,8 +2,16 @@ import fs from "node:fs";
 
 export type RgbColor = [number, number, number];
 
+export interface WledPayload {
+  on?: boolean;
+  bri?: number;
+  seg?: Array<Record<string, unknown>>;
+  [key: string]: unknown;
+}
+
 export interface WledProfile {
-  color: RgbColor;
+  color?: RgbColor;
+  payload?: WledPayload;
 }
 
 export interface WledConfig {

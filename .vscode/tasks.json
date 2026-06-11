@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "wled:help",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["wled"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "wled:running",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["wled:running"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "wled:ports",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["wled:ports"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,15 +1,5 @@
 import { SerialPort } from "serialport";
-import type { WledConfig, WledProfile } from "./config.js";
-
-export interface WledPayload {
-  on?: boolean;
-  bri?: number;
-  seg?: Array<{
-    start?: number;
-    stop?: number;
-    col: Array<[number, number, number]>;
-  }>;
-}
+import type { WledConfig, WledPayload, WledProfile } from "./config.js";
 
 export interface SegmentOptions {
   color?: [number, number, number];
@@ -20,6 +10,14 @@ export interface SegmentOptions {
 }
 
 export function buildProfilePayload(config: WledConfig, profile: WledProfile): WledPayload {
+  if (profile.payload) {
+    return profile.payload;
+  }
+
+  if (!profile.color) {
+    throw new Error("Profile must define either payload or color.");
+  }
+
   const ledRange = config.defaults?.ledRange ?? {};
   const start =
     typeof ledRange.start === "number" && Number.isInteger(ledRange.start)

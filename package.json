@@ -1,7 +1,7 @@
 {
   "name": "esp32",
   "version": "1.0.0",
-  "description": "",
+  "description": "Serial WLED CLI for ESP32 light control.",
   "type": "module",
   "bin": {
     "wled": "dist/wled.mjs"
@@ -9,14 +9,20 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
-    "wled": "node dist/wled.mjs",
-    "wled:profile": "node dist/wled.mjs profile",
+    "wled": "node dist/wled.mjs --help",
+    "wled:running": "node dist/wled.mjs running",
+    "wled:success": "node dist/wled.mjs success",
+    "wled:error": "node dist/wled.mjs error",
+    "wled:review": "node dist/wled.mjs review",
+    "wled:finish": "node dist/wled.mjs finish",
+    "wled:profile": "node dist/wled.mjs profile running",
     "wled:send": "node dist/wled.mjs send",
     "wled:off": "node dist/wled.mjs off",
-    "wled:ports": "node dist/wled.mjs ports"
+    "wled:ports": "node dist/wled.mjs ports",
+    "start": "pnpm wled"
   },
   "keywords": [],
-  "author": "",
+  "author": "sheep",
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "dependencies": {
