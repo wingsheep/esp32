@@ -3,20 +3,29 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "bin": {
+    "wled": "dist/wled.mjs"
+  },
   "scripts": {
-    "wled:running": "node scripts/wled-hook.js running",
-    "wled:success": "node scripts/wled-hook.js success",
-    "wled:error": "node scripts/wled-hook.js error",
-    "wled:review": "node scripts/wled-hook.js review",
-    "wled:finish": "node scripts/wled-hook.js finish",
-    "wled:off": "node scripts/wled-off.js",
-    "ports": "node scripts/wled-ports.js"
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "wled": "node dist/wled.mjs",
+    "wled:profile": "node dist/wled.mjs profile",
+    "wled:send": "node dist/wled.mjs send",
+    "wled:off": "node dist/wled.mjs off",
+    "wled:ports": "node dist/wled.mjs ports"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.6.5",
   "dependencies": {
+    "commander": "^15.0.0",
     "serialport": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "tsdown": "^0.22.2",
+    "typescript": "^6.0.3"
   }
 }

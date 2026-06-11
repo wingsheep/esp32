@@ -1,19 +1,53 @@
 {
   "hooks": {
-    "task:start": [
-      "node scripts/wled-hook.js running"
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs running",
+            "timeout": 5,
+            "statusMessage": "WLED: running"
+          }
+        ]
+      }
     ],
-    "task:success": [
-      "node scripts/wled-hook.js success"
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs review",
+            "timeout": 5,
+            "statusMessage": "WLED: review"
+          }
+        ]
+      }
     ],
-    "task:error": [
-      "node scripts/wled-hook.js error"
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/sheep/Desktop/me/esp32/.codex/hooks/post-tool-use.mjs",
+            "timeout": 5,
+            "statusMessage": "WLED: tool result"
+          }
+        ]
+      }
     ],
-    "review:start": [
-      "node scripts/wled-hook.js review"
-    ],
-    "task:complete": [
-      "node scripts/wled-hook.js finish"
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs finish",
+            "timeout": 5,
+            "statusMessage": "WLED: finish"
+          }
+        ]
+      }
     ]
   }
 }

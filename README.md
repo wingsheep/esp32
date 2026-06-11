@@ -15,26 +15,32 @@
 pnpm install
 ```
 
+## 构建
+
+项目使用 TypeScript 编写，并通过 `tsdown` 打包 CLI：
+
+```bash
+pnpm typecheck
+pnpm build
+```
+
+构建产物位于 `dist/wled.mjs`，也是 `package.json` 中声明的 CLI 入口。
+
 ## 配置
 
-配置文件位于 `scripts/wled-config.json`：
+配置文件位于 `scripts/wled-profiles.json`：
 
 ```json
 {
   "port": "/dev/cu.usbserial-0001",
   "baudRate": 115200,
-  "ledRange": {
-    "start": 0,
-    "stop": null
+  "defaults": {
+    "ledRange": {
+      "start": 0,
+      "stop": null
+    }
   },
-  "presets": {
-    "running": 1,
-    "success": 2,
-    "error": 3,
-    "review": 4,
-    "finish": 5
-  },
-  "states": {
+  "profiles": {
     "running": {
       "color": [0, 0, 255]
     },
@@ -58,49 +64,96 @@ pnpm install
 
 - `port`：ESP32 串口路径。
 - `baudRate`：串口波特率。
-- `ledRange`：灯珠控制范围。
-- `ledRange.start`：起始灯珠索引，从 `0` 开始。
-- `ledRange.stop`：结束灯珠索引，不包含该位置；设为 `null` 表示不限制结束位置。
-- `presets`：历史保留字段，记录任务状态与 WLED 预设编号的映射；当前脚本不依赖该字段。
-- `states`：当前实际使用的灯光状态配置。
-- `states.*.color`：RGB 颜色，格式为 `[红, 绿, 蓝]`，取值范围为 `0-255`。
+- `defaults.ledRange`：默认灯珠控制范围。
+- `defaults.ledRange.start`：起始灯珠索引，从 `0` 开始。
+- `defaults.ledRange.stop`：结束灯珠索引，不包含该位置；设为 `null` 表示不限制结束位置。
+- `profiles`：本地快捷配置，不对应 WLED 设备里的 preset。
+- `profiles.*.color`：RGB 颜色，格式为 `[红, 绿, 蓝]`，取值范围为 `0-255`。
 
 例如只控制前 10 颗灯：
 
 ```json
-"ledRange": {
-  "start": 0,
-  "stop": 10
+"defaults": {
+  "ledRange": {
+    "start": 0,
+    "stop": 10
+  }
 }
 ```
 
 如果不确定串口路径，先运行：
 
 ```bash
-pnpm ports
+pnpm wled:ports
 ```
 
 ## 可用命令
 
 ```bash
-pnpm wled:running
-pnpm wled:success
-pnpm wled:error
-pnpm wled:review
-pnpm wled:finish
+pnpm wled -- running
+pnpm wled -- success
+pnpm wled -- error
+pnpm wled -- review
+pnpm wled -- finish
 pnpm wled:off
-pnpm ports
+pnpm wled:ports
+```
+
+也可以直接使用 CLI：
+
+```bash
+node dist/wled.mjs --help
+node dist/wled.mjs send --help
+node dist/wled.mjs running
+node dist/wled.mjs success
+node dist/wled.mjs error
+node dist/wled.mjs review
+node dist/wled.mjs finish
+node dist/wled.mjs off
+node dist/wled.mjs ports
 ```
 
 命令含义：
 
-- `wled:running`：切换到运行中灯光。
-- `wled:success`：切换到成功灯光。
-- `wled:error`：切换到错误灯光。
-- `wled:review`：切换到审核灯光。
-- `wled:finish`：切换到完成灯光。
+- `wled -- running`：应用 `running` profile。
+- `wled -- success`：应用 `success` profile。
+- `wled -- error`：应用 `error` profile。
+- `wled -- review`：应用 `review` profile。
+- `wled -- finish`：应用 `finish` profile。
 - `wled:off`：关闭灯光。
-- `ports`：列出本机可用串口。
+- `wled:ports`：列出本机可用串口。
+
+## 灵活发送
+
+`send` 子命令用于像 `curl` 一样发送自定义 WLED JSON：
+
+```bash
+node dist/wled.mjs send --json '{"on":true,"bri":128}'
+node dist/wled.mjs send --json '{"on":true,"seg":[{"col":[[0,255,0]]}]}'
+node dist/wled.mjs send --file payload.json
+cat payload.json | node dist/wled.mjs send --stdin
+```
+
+也可以用参数生成常见 payload：
+
+```bash
+node dist/wled.mjs send --color 255,0,0
+node dist/wled.mjs send --color 0,0,255 --brightness 160 --range 0:20
+node dist/wled.mjs send --off
+```
+
+`--range 0:20` 表示控制索引 `0` 到 `19` 的 20 颗灯。
+
+## Codex 集成
+
+项目级 hooks 位于 `.codex/hooks.json`，使用 Codex 官方 hooks 格式：
+
+- `UserPromptSubmit`：切换到 `running`。
+- `PermissionRequest`：切换到 `review`。
+- `PostToolUse`：调用 `.codex/hooks/post-tool-use.mjs`，仅在工具返回非 0 退出码时切换到 `error`。
+- `Stop`：切换到 `finish`。
+
+项目还提供了 skill：`.codex/skills/wled/SKILL.md`。当 AI 需要测试、配置或主动控制物理状态灯时，可以按该 skill 的说明调用 CLI。
 
 ## 灯光说明
 
@@ -115,31 +168,37 @@ pnpm ports
 | `finish` | `[255, 255, 255]` | 白色，表示任务完成 |
 | `off` | - | 关闭灯光 |
 
-如果要调整颜色，修改 `scripts/wled-config.json` 中对应状态的 `color` 即可。
+如果要调整颜色，修改 `scripts/wled-profiles.json` 中对应 profile 的 `color` 即可。
 
 ## 项目结构
 
 ```text
 .
+├── .codex
+│   ├── hooks
+│   │   └── post-tool-use.mjs
+│   └── skills
+│       └── wled
+│           └── SKILL.md
+├── dist
+│   └── wled.mjs
 ├── package.json
 ├── pnpm-lock.yaml
-└── scripts
-    ├── wled-config.json
-    ├── wled-hook.js
-    ├── wled-off.js
-    └── wled-ports.js
+├── scripts
+│   └── wled-profiles.json
+└── src
+    ├── cli.ts
+    ├── config.ts
+    └── wled.ts
 ```
 
 ## 当前问题
 
-- `package.json` 的 `test` 命令固定失败；如果暂时不需要测试，建议改成占位成功命令或删除。
-- `scripts/wled-config.json` 直接记录本机串口路径；换设备或换机器后通常需要修改。
-- `ledRange.stop` 默认是 `null`，表示不限制灯珠数量；如果只想点亮部分灯珠，需要明确设置。
-- `presets` 字段当前只是历史保留；如果确认不再使用 WLED 预设，可以删除。
-- 脚本对未知状态直接静默退出，排查命令拼写错误时不够直观。
+- `scripts/wled-profiles.json` 直接记录本机串口路径；换设备或换机器后通常需要修改。
+- `defaults.ledRange.stop` 默认是 `null`，表示不限制灯珠数量；如果只想点亮部分灯珠，需要明确设置。
 
 ## 排查建议
 
-- 先用 `pnpm ports` 确认串口路径。
-- 确认 `scripts/wled-config.json` 中的 `port` 与实际串口一致。
+- 先用 `pnpm wled:ports` 确认串口路径。
+- 确认 `scripts/wled-profiles.json` 中的 `port` 与实际串口一致。
 - 如果命令执行成功但灯光无变化，优先检查串口权限、波特率和 WLED 串口 JSON 支持状态。
