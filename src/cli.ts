@@ -2,6 +2,8 @@
 import { Command } from "commander";
 import fs from "node:fs";
 import { loadConfig } from "./config.js";
+import type { WledPayload } from "./config.js";
+import { isCurrentOwner, resolveOwner, writeOwnerState } from "./owner.js";
 import { buildProfilePayload, buildSegmentPayload, listPorts, sendWledPayload } from "./wled.js";
 
 const program = new Command();
@@ -52,6 +54,16 @@ function parseByte(value: string): number {
   return parsed;
 }
 
+function parseNonNegativeInteger(value: string): number {
+  const parsed = parseInteger(value);
+
+  if (parsed < 0) {
+    throw new Error(`Expected non-negative integer, got "${value}".`);
+  }
+
+  return parsed;
+}
+
 function parseRange(value: string): { start?: number; stop?: number } {
   const [startValue, stopValue] = value.split(":");
   const start = startValue ? parseInteger(startValue) : undefined;
@@ -78,11 +90,38 @@ async function readStdin(): Promise<string> {
   return input;
 }
 
+interface ApplyOptions {
+  offAfter?: number;
+  owner?: string;
+  trackOwner?: boolean;
+}
+
+async function applyPayload(payload: WledPayload, options: ApplyOptions = {}): Promise<void> {
+  const config = loadConfig();
+  const owner = resolveOwner(options.owner);
+
+  await sendWledPayload(config, payload);
+
+  if (options.trackOwner !== false) {
+    writeOwnerState(owner);
+  }
+
+  if (typeof options.offAfter === "number" && options.offAfter > 0) {
+    await new Promise(resolve => setTimeout(resolve, options.offAfter));
+
+    if (isCurrentOwner(owner)) {
+      await sendWledPayload(config, { on: false });
+    }
+  }
+}
+
 for (const profileName of profileNames) {
   program
     .command(profileName)
     .description(`Apply profile "${profileName}".`)
-    .action(async () => {
+    .option("--off-after <ms>", "Turn light off after the given delay in milliseconds.", parseNonNegativeInteger)
+    .option("--owner <id>", "Owner id used to protect delayed off from other sessions.")
+    .action(async options => {
       const config = loadConfig();
       const profile = config.profiles[profileName];
 
@@ -90,7 +129,10 @@ for (const profileName of profileNames) {
         throw new Error(`Profile "${profileName}" is not configured.`);
       }
 
-      await sendWledPayload(config, buildProfilePayload(config, profile));
+      await applyPayload(buildProfilePayload(config, profile), {
+        offAfter: options.offAfter,
+        owner: options.owner,
+      });
     });
 }
 
@@ -98,7 +140,9 @@ program
   .command("profile")
   .description("Apply one configured local profile.")
   .argument("<name>", `Profile name: ${profileNames.join(", ")}.`)
-  .action(async name => {
+  .option("--off-after <ms>", "Turn light off after the given delay in milliseconds.", parseNonNegativeInteger)
+  .option("--owner <id>", "Owner id used to protect delayed off from other sessions.")
+  .action(async (name, options) => {
     const config = loadConfig();
     const profile = config.profiles[name];
 
@@ -106,7 +150,10 @@ program
       throw new Error(`Profile "${name}" is not configured.`);
     }
 
-    await sendWledPayload(config, buildProfilePayload(config, profile));
+    await applyPayload(buildProfilePayload(config, profile), {
+      offAfter: options.offAfter,
+      owner: options.owner,
+    });
   });
 
 program
@@ -120,6 +167,8 @@ program
   .option("-b, --brightness <value>", "Set brightness 0-255.", parseByte)
   .option("--on", "Turn light on.")
   .option("--off", "Turn light off.")
+  .option("--off-after <ms>", "Turn light off after the given delay in milliseconds.", parseNonNegativeInteger)
+  .option("--owner <id>", "Owner id used to protect delayed off from other sessions.")
   .addHelpText(
     "after",
     `
@@ -159,13 +208,24 @@ Examples:
       throw new Error("No payload specified. Use --help for examples.");
     }
 
-    await sendWledPayload(loadConfig(), payload);
+    await applyPayload(payload, {
+      offAfter: options.offAfter,
+      owner: options.owner,
+      trackOwner: !options.off,
+    });
   });
 
 program
   .command("off")
   .description("Turn the WLED light off.")
-  .action(async () => {
+  .option("--owner <id>", "Only turn off when the current owner matches this owner id.")
+  .action(async options => {
+    const owner = options.owner ? resolveOwner(options.owner) : undefined;
+
+    if (owner && !isCurrentOwner(owner)) {
+      return;
+    }
+
     await sendWledPayload(loadConfig(), { on: false });
   });
 

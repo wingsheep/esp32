@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs running",
+            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs running --owner esp32",
             "timeout": 5,
             "statusMessage": "WLED: running"
           }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs review",
+            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs review --owner esp32",
             "timeout": 5,
             "statusMessage": "WLED: review"
           }
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node /Users/sheep/Desktop/me/esp32/.codex/hooks/wled-after.mjs finish 3000",
+            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs finish --owner esp32 --off-after 3000",
             "timeout": 8,
             "statusMessage": "WLED: finish then off"
           }

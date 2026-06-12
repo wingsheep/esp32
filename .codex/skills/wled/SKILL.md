@@ -41,6 +41,8 @@ Flexible send examples:
 ```bash
 node /Users/sheep/Desktop/me/esp32/dist/wled.mjs send --json '{"on":true,"bri":128}'
 node /Users/sheep/Desktop/me/esp32/dist/wled.mjs send --color 255,0,0 --range 0:10
+node /Users/sheep/Desktop/me/esp32/dist/wled.mjs running --off-after 3000
+node /Users/sheep/Desktop/me/esp32/dist/wled.mjs running --owner esp32 --off-after 3000
 cat payload.json | node /Users/sheep/Desktop/me/esp32/dist/wled.mjs send --stdin
 ```
 
@@ -63,6 +65,7 @@ Edit `/Users/sheep/Desktop/me/esp32/scripts/wled-profiles.json` to change:
 - `defaults.ledRange.stop`: exclusive ending LED index. Use `null` to control all LEDs.
 - `profiles.*.color`: shorthand RGB color values.
 - `profiles.*.payload`: full WLED JSON payload. This takes precedence over `color`.
+- `--owner <id>` protects delayed off from other sessions. If omitted, owner is derived from the git root.
 
 ## Codex Hooks
 
@@ -70,8 +73,8 @@ Project hooks are configured in `/Users/sheep/Desktop/me/esp32/.codex/hooks.json
 
 - `UserPromptSubmit`: runs `wled running`.
 - `PermissionRequest`: runs `wled review`.
-- `PostToolUse`: runs `.codex/hooks/post-tool-use.mjs`; only failed tool calls trigger `wled error`, then auto-off after 5 seconds.
-- `Stop`: runs `.codex/hooks/wled-after.mjs finish 3000`; triggers `wled finish`, then auto-off after 3 seconds.
+- `PostToolUse`: runs `.codex/hooks/post-tool-use.mjs`; only failed tool calls trigger `wled error --owner esp32 --off-after 5000`.
+- `Stop`: runs `wled finish --owner esp32 --off-after 3000`.
 
 ## Notes
 

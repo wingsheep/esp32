@@ -154,9 +154,14 @@ cat payload.json | node dist/wled.mjs send --stdin
 node dist/wled.mjs send --color 255,0,0
 node dist/wled.mjs send --color 0,0,255 --brightness 160 --range 0:20
 node dist/wled.mjs send --off
+node dist/wled.mjs running --off-after 3000
+node dist/wled.mjs send --color 255,0,0 --off-after 5000
+node dist/wled.mjs running --owner esp32 --off-after 3000
 ```
 
 `--range 0:20` 表示控制索引 `0` 到 `19` 的 20 颗灯。
+`--off-after 3000` 表示发送当前灯效后等待 3000 毫秒再自动关闭。
+`--owner esp32` 表示这次灯效属于 `esp32`；延迟关灯前会检查 owner，避免另一个会话已经接管灯光时被误关。未传 `--owner` 时，CLI 会根据当前 git 根目录自动生成 owner。
 
 需要自定义 profile 名称时，直接传给 CLI：
 
@@ -170,8 +175,8 @@ node dist/wled.mjs profile running
 
 - `UserPromptSubmit`：切换到 `running`。
 - `PermissionRequest`：切换到 `review`。
-- `PostToolUse`：调用 `.codex/hooks/post-tool-use.mjs`，仅在工具返回非 0 退出码时切换到 `error`，5 秒后自动关闭。
-- `Stop`：调用 `.codex/hooks/wled-after.mjs finish 3000`，切换到 `finish`，3 秒后自动关闭。
+- `PostToolUse`：调用 `.codex/hooks/post-tool-use.mjs`，仅在工具返回非 0 退出码时切换到 `error --owner esp32 --off-after 5000`。
+- `Stop`：切换到 `finish --owner esp32 --off-after 3000`。
 
 项目还提供了 skill：`.codex/skills/wled/SKILL.md`。当 AI 需要测试、配置或主动控制物理状态灯时，可以按该 skill 的说明调用 CLI。
 
@@ -215,8 +220,7 @@ node dist/wled.mjs profile running
 .
 ├── .codex
 │   ├── hooks
-│   │   ├── post-tool-use.mjs
-│   │   └── wled-after.mjs
+│   │   └── post-tool-use.mjs
 │   └── skills
 │       └── wled
 │           └── SKILL.md
