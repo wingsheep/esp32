@@ -2,6 +2,7 @@
 import { spawn } from "node:child_process";
 
 const wledCli = "/Users/sheep/Desktop/me/esp32/dist/wled.mjs";
+const offDelayMs = 5000;
 
 async function readStdin() {
   let input = "";
@@ -22,18 +23,15 @@ function getExitCode(event) {
   );
 }
 
-function runWledError() {
-  const child = spawn(process.execPath, [wledCli, "error"], {
-    stdio: "ignore",
-    detached: false,
-  });
+function runWled(args) {
+  return new Promise(resolve => {
+    const child = spawn(process.execPath, [wledCli, ...args], {
+      stdio: "ignore",
+      detached: false,
+    });
 
-  child.on("exit", code => {
-    process.exit(code ?? 0);
-  });
-
-  child.on("error", () => {
-    process.exit(0);
+    child.on("exit", () => resolve());
+    child.on("error", () => resolve());
   });
 }
 
@@ -60,7 +58,9 @@ if (hookEventName !== "PostToolUse") {
 const exitCode = getExitCode(event);
 
 if (typeof exitCode === "number" && exitCode !== 0) {
-  runWledError();
+  await runWled(["error"]);
+  await new Promise(resolve => setTimeout(resolve, offDelayMs));
+  await runWled(["off"]);
 } else {
   process.exit(0);
 }

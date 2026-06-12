@@ -170,8 +170,8 @@ node dist/wled.mjs profile running
 
 - `UserPromptSubmit`：切换到 `running`。
 - `PermissionRequest`：切换到 `review`。
-- `PostToolUse`：调用 `.codex/hooks/post-tool-use.mjs`，仅在工具返回非 0 退出码时切换到 `error`。
-- `Stop`：切换到 `finish`。
+- `PostToolUse`：调用 `.codex/hooks/post-tool-use.mjs`，仅在工具返回非 0 退出码时切换到 `error`，5 秒后自动关闭。
+- `Stop`：调用 `.codex/hooks/wled-after.mjs finish 3000`，切换到 `finish`，3 秒后自动关闭。
 
 项目还提供了 skill：`.codex/skills/wled/SKILL.md`。当 AI 需要测试、配置或主动控制物理状态灯时，可以按该 skill 的说明调用 CLI。
 
@@ -215,7 +215,8 @@ node dist/wled.mjs profile running
 .
 ├── .codex
 │   ├── hooks
-│   │   └── post-tool-use.mjs
+│   │   ├── post-tool-use.mjs
+│   │   └── wled-after.mjs
 │   └── skills
 │       └── wled
 │           └── SKILL.md

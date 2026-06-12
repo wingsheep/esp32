@@ -42,9 +42,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node /Users/sheep/Desktop/me/esp32/dist/wled.mjs finish",
-            "timeout": 5,
-            "statusMessage": "WLED: finish"
+            "command": "node /Users/sheep/Desktop/me/esp32/.codex/hooks/wled-after.mjs finish 3000",
+            "timeout": 8,
+            "statusMessage": "WLED: finish then off"
           }
         ]
       }

@@ -70,8 +70,8 @@ Project hooks are configured in `/Users/sheep/Desktop/me/esp32/.codex/hooks.json
 
 - `UserPromptSubmit`: runs `wled running`.
 - `PermissionRequest`: runs `wled review`.
-- `PostToolUse`: runs `.codex/hooks/post-tool-use.mjs`; only failed tool calls trigger `wled error`.
-- `Stop`: runs `wled finish`.
+- `PostToolUse`: runs `.codex/hooks/post-tool-use.mjs`; only failed tool calls trigger `wled error`, then auto-off after 5 seconds.
+- `Stop`: runs `.codex/hooks/wled-after.mjs finish 3000`; triggers `wled finish`, then auto-off after 3 seconds.
 
 ## Notes
 
