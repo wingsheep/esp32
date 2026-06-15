@@ -163,6 +163,41 @@ node dist/wled.mjs running --owner esp32 --off-after 3000
 `--off-after 3000` 表示发送当前灯效后等待 3000 毫秒再自动关闭。
 `--owner esp32` 表示这次灯效属于 `esp32`；延迟关灯前会检查 owner，避免另一个会话已经接管灯光时被误关。未传 `--owner` 时，CLI 会根据当前 git 根目录自动生成 owner。
 
+## HTTP 网关
+
+如果 ESP32 无法连接内网，可以在连接串口的机器上启动 HTTP 到串口的转发服务：
+
+```bash
+pnpm server
+```
+
+默认监听 `127.0.0.1:8787`。如果需要给内网其他机器访问：
+
+```bash
+node dist/wled-server.mjs --host 0.0.0.0 --port 8787
+```
+
+接口示例：
+
+```bash
+curl http://127.0.0.1:8787/health
+curl http://127.0.0.1:8787/ports
+curl -X POST http://127.0.0.1:8787/profile/running
+curl -X POST 'http://127.0.0.1:8787/profile/error?offAfter=5000&owner=esp32'
+curl -X POST http://127.0.0.1:8787/off
+curl -X POST http://127.0.0.1:8787/send \
+  -H 'content-type: application/json' \
+  -d '{"on":true,"bri":160,"seg":[{"fx":2,"col":[[0,0,255]]}]}'
+```
+
+`/send` 也支持包装格式，便于传 `owner/offAfter`：
+
+```bash
+curl -X POST 'http://127.0.0.1:8787/send?owner=esp32&offAfter=3000' \
+  -H 'content-type: application/json' \
+  -d '{"payload":{"on":true,"bri":160}}'
+```
+
 需要自定义 profile 名称时，直接传给 CLI：
 
 ```bash
@@ -225,7 +260,8 @@ node dist/wled.mjs profile running
 │       └── wled
 │           └── SKILL.md
 ├── dist
-│   └── wled.mjs
+│   ├── wled.mjs
+│   └── wled-server.mjs
 ├── package.json
 ├── pnpm-lock.yaml
 ├── scripts
@@ -233,6 +269,7 @@ node dist/wled.mjs profile running
 └── src
     ├── cli.ts
     ├── config.ts
+    ├── server.ts
     └── wled.ts
 ```
 

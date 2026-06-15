@@ -20,6 +20,7 @@ pnpm wled:review
 pnpm wled:finish
 pnpm wled:off
 pnpm wled:ports
+pnpm server
 ```
 
 Direct CLI form:
@@ -44,6 +45,14 @@ node /Users/sheep/Desktop/me/esp32/dist/wled.mjs send --color 255,0,0 --range 0:
 node /Users/sheep/Desktop/me/esp32/dist/wled.mjs running --off-after 3000
 node /Users/sheep/Desktop/me/esp32/dist/wled.mjs running --owner esp32 --off-after 3000
 cat payload.json | node /Users/sheep/Desktop/me/esp32/dist/wled.mjs send --stdin
+```
+
+HTTP gateway examples:
+
+```bash
+node /Users/sheep/Desktop/me/esp32/dist/wled-server.mjs --host 127.0.0.1 --port 8787
+curl -X POST http://127.0.0.1:8787/profile/running
+curl -X POST http://127.0.0.1:8787/send -H 'content-type: application/json' -d '{"on":true,"bri":160}'
 ```
 
 ## State Map

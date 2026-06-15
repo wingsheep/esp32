@@ -4,7 +4,8 @@
   "description": "Serial WLED CLI for ESP32 light control.",
   "type": "module",
   "bin": {
-    "wled": "dist/wled.mjs"
+    "wled": "dist/wled.mjs",
+    "wled-server": "dist/wled-server.mjs"
   },
   "scripts": {
     "build": "tsdown",
@@ -19,6 +20,7 @@
     "wled:send": "node dist/wled.mjs send",
     "wled:off": "node dist/wled.mjs off",
     "wled:ports": "node dist/wled.mjs ports",
+    "server": "node dist/wled-server.mjs",
     "start": "pnpm wled"
   },
   "keywords": [],
