@@ -16,7 +16,6 @@
     "wled:error": "node dist/wled.mjs error",
     "wled:review": "node dist/wled.mjs review",
     "wled:finish": "node dist/wled.mjs finish",
-    "wled:profile": "node dist/wled.mjs profile running",
     "wled:send": "node dist/wled.mjs send",
     "wled:off": "node dist/wled.mjs off",
     "wled:ports": "node dist/wled.mjs ports",
