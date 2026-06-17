@@ -275,11 +275,12 @@ node dist/wled.mjs profile running
 
 ## 当前问题
 
-- `scripts/wled-profiles.json` 直接记录本机串口路径；换设备或换机器后通常需要修改。
+- `scripts/wled-profiles.json` 直接记录本机串口路径；如果该路径失效，脚本会在只检测到一个 USB 串口时自动使用它。
+- 如果没有检测到 USB 串口，或同时检测到多个 USB 串口，需要重新插拔设备或手动更新 `port`。
 - `defaults.ledRange.stop` 默认是 `null`，表示不限制灯珠数量；如果只想点亮部分灯珠，需要明确设置。
 
 ## 排查建议
 
 - 先用 `pnpm wled:ports` 确认串口路径。
-- 确认 `scripts/wled-profiles.json` 中的 `port` 与实际串口一致。
+- 如果有多个 USB 串口，确认 `scripts/wled-profiles.json` 中的 `port` 与目标 ESP32 一致。
 - 如果命令执行成功但灯光无变化，优先检查串口权限、波特率和 WLED 串口 JSON 支持状态。
